@@ -16,3 +16,19 @@ server:
   adminConnectors:
     - type: http
       port: 7081
+
+# I have been experimenting some with the default Dropwizard use of Apache HttpClient but
+# haven't decided on how I want to use it or how best to configure it, seems like the defaults
+# are pretty good for experimenting on local dev environment.
+# https://www.dropwizard.io/en/latest/manual/client.html
+# https://www.dropwizard.io/en/latest/manual/configuration.html#man-configuration-clients-http
+#httpClient:
+#  timeout: 500ms
+#  connectionTimeout: 500ms
+#  timeToLive: 1h
+#  cookiesEnabled: false
+#  maxConnections: 1024
+#  maxConnectionsPerRoute: 1024
+#  keepAlive: 0ms
+#  retries: 0
+#  userAgent: KotlinInventoryService(KotlinProductService)

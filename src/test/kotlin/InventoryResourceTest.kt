@@ -2,8 +2,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import honstain.InventoryResource
 import honstain.api.Inventory
+import honstain.api.InventoryWithProduct
+import honstain.api.Product
+import honstain.client.ProductClient
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport
 import io.dropwizard.testing.junit5.ResourceExtension
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -19,8 +24,9 @@ class InventoryResourceTest {
     https://www.dropwizard.io/en/latest/manual/testing.html#testing-resources
      */
 
+    val productClient = mockk<ProductClient>()
     val EXT: ResourceExtension = ResourceExtension.builder()
-            .addResource(InventoryResource())
+            .addResource(InventoryResource(productClient))
             .setMapper(ObjectMapper().registerModule(KotlinModule()))
             .build()
 
@@ -33,6 +39,24 @@ class InventoryResourceTest {
                 Inventory(5,1, 5),
                 Inventory(5,2, 5),
                 Inventory(5,3, 5),
+        )
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `GET single inventory with product`() {
+
+        every { productClient.getProduct(1) } returns Product(1, "SKU-01", null, null)
+        every { productClient.getProduct(2) } returns Product(2, "SKU-02", null, null)
+        every { productClient.getProduct(3) } returns Product(3, "SKU-03", null, null)
+
+        val result = EXT.target("/inventory/5/withProduct").request().get(object: GenericType<List<InventoryWithProduct>>() {})
+        // TODO - warning: the data is sourced from a dump in-memory hashMap so that I could work around the need for a DB.
+
+        val expected = listOf(
+                InventoryWithProduct(5,1, 5, "SKU-01"),
+                InventoryWithProduct(5,2, 5, "SKU-02"),
+                InventoryWithProduct(5,3, 5, "SKU-03"),
         )
         assertEquals(expected, result)
     }
