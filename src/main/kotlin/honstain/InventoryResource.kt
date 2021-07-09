@@ -4,6 +4,8 @@ import com.codahale.metrics.annotation.Timed
 import honstain.api.Inventory
 import honstain.api.InventoryWithProduct
 import honstain.client.ProductClient
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
@@ -11,6 +13,8 @@ import javax.ws.rs.core.MediaType
 @Path("/inventory")
 @Produces(MediaType.APPLICATION_JSON)
 class InventoryResource(val productClient: ProductClient) {
+
+    val log: Logger = LoggerFactory.getLogger(InventoryResource::class.java)
 
     val locationToProduct = mutableMapOf(
             5L to mutableSetOf(1L, 2L, 3L)
@@ -51,6 +55,8 @@ class InventoryResource(val productClient: ProductClient) {
     @Timed
     @Path("/{locationId}/withProduct")
     fun getSingleWithProduct(@PathParam("locationId") locationId: Long): List<InventoryWithProduct> {
+        log.debug("getSingleWithProduct $locationId")
+
         val products: MutableSet<Long> = locationToProduct.getOrElse(locationId, {
             throw NotFoundException("There is no inventory for locationId:$locationId")
         })
@@ -58,6 +64,7 @@ class InventoryResource(val productClient: ProductClient) {
         val result = mutableListOf<InventoryWithProduct>()
         for(productId in products){
             val inventory: Inventory = inventoryRecords.getOrElse(Pair(locationId, productId),{ throw WebApplicationException() })
+            log.debug("For inventory:${inventory.locationId} get product:$productId")
             val product = productClient.getProduct(productId)
             result.add(InventoryWithProduct(
                     inventory.locationId,

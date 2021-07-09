@@ -2,12 +2,32 @@ logging:
   level: INFO
   loggers:
     honstain: DEBUG
+  appenders:
+    - type: file
+      threshold: ERROR
+      currentLogFilename: ./logs/inventory_ERROR_json.log
+      archivedLogFilenamePattern: ./logs/inventory_ERROR_json-%d.log.gz
+      archivedFileCount: 5
+    - type: file
+      threshold: DEBUG
+      filterFactories:
+        - type: less-than-errors
+      layout:
+        type: json
+        flattenMdc: true
+      currentLogFilename: ./logs/inventory_json.log
+      archivedLogFilenamePattern: ./logs/inventory_json-%d.log.gz
+      archivedFileCount: 5
+    - type: console
+
 
 # Setup initial configuration following Dropwizard docs - dropped HTTPS and certs
 # https://www.dropwizard.io/en/latest/manual/configuration.html#default
 server:
+  minThreads: 4
+  maxThreads: 4 # Setting this super low to help me explore the system under resource constraints
   adminMinThreads: 1
-  adminMaxThreads: 64
+  adminMaxThreads: 4
   adminContextPath: /
   applicationContextPath: /
   applicationConnectors:
@@ -16,6 +36,16 @@ server:
   adminConnectors:
     - type: http
       port: 7081
+  requestLog:
+    appenders:
+      - type: file
+        threshold: ALL
+        logFormat:  "%h %l %u [%date{ISO8601}] %I '%r' %s %b '%i{Referer}' '%i{User-Agent}' %D"
+        #logFormat:  "%h %l %u [%t] '%r' %s %b '%i{Referer}' '%i{User-Agent}' %D"
+        #logFormat: '%h [%date{ISO8601}] "%r" %s %b %D [%i{User-Agent}]'
+        currentLogFilename: ./logs/request.log
+        archivedLogFilenamePattern: ./logs/request-%d.log.gz
+        archivedFileCount: 5
 
 # I have been experimenting some with the default Dropwizard use of Apache HttpClient but
 # haven't decided on how I want to use it or how best to configure it, seems like the defaults

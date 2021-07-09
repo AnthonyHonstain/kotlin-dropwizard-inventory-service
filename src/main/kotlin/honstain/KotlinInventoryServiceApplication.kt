@@ -46,5 +46,6 @@ class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfi
         val productClient = ProductClient(httpClient, env.objectMapper)
 
         env.jersey().register(InventoryResource(productClient))
+        env.jersey().register(ProvenanceIDFilter())
     }
 }
