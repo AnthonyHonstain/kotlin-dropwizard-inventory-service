@@ -5,13 +5,16 @@ import com.codahale.metrics.graphite.Graphite
 import com.codahale.metrics.graphite.GraphiteReporter
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import honstain.client.ProductClient
+import honstain.client.ProductJerseyClient
 import io.dropwizard.Application
 import io.dropwizard.client.HttpClientBuilder
+import io.dropwizard.client.JerseyClientBuilder
 import io.dropwizard.setup.Environment
 import org.apache.http.impl.client.CloseableHttpClient
 import java.net.InetSocketAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.ws.rs.client.Client
 
 
 class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfiguration>() {
@@ -40,10 +43,15 @@ class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfi
          */
         env.objectMapper.registerModule(KotlinModule())
 
-        val httpClient: CloseableHttpClient = HttpClientBuilder(env)
-                .using(config.getHttpClientConfiguration())
+        val client: Client = JerseyClientBuilder(env)
+                .using(config.getJerseyClientConfiguration())
                 .build(name)
-        val productClient = ProductClient(httpClient, env.objectMapper)
+        val productClient = ProductJerseyClient(client)
+
+        //val httpClient: CloseableHttpClient = HttpClientBuilder(env)
+        //        .using(config.getHttpClientConfiguration())
+        //        .build(name)
+        //val productClient = ProductClient(httpClient, env.objectMapper)
 
         env.jersey().register(InventoryResource(productClient))
         env.jersey().register(ProvenanceIDFilter())

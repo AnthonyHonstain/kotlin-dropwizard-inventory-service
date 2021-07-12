@@ -3,7 +3,7 @@ package honstain
 import com.codahale.metrics.annotation.Timed
 import honstain.api.Inventory
 import honstain.api.InventoryWithProduct
-import honstain.client.ProductClient
+import honstain.client.IProduct
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.ws.rs.*
@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType
 
 @Path("/inventory")
 @Produces(MediaType.APPLICATION_JSON)
-class InventoryResource(val productClient: ProductClient) {
+class InventoryResource(val productClient: IProduct) {
 
     val log: Logger = LoggerFactory.getLogger(InventoryResource::class.java)
 

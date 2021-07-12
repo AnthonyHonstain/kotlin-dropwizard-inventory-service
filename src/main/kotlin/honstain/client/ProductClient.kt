@@ -13,11 +13,11 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 
-class ProductClient(val httpClient: CloseableHttpClient, val objectMapper: ObjectMapper) {
+class ProductClient(val httpClient: CloseableHttpClient, val objectMapper: ObjectMapper): IProduct {
 
     val log: Logger = LoggerFactory.getLogger(ProductClient::class.java)
 
-    fun getProduct(productId: Long): Product {
+    override fun getProduct(productId: Long): Product {
         val httpGet = HttpGet("http://localhost:7070/product/$productId")
 
         val provenanceID = MDC.get("ProvenanceID")
