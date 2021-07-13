@@ -5,6 +5,7 @@ import honstain.api.Inventory
 import honstain.api.InventoryWithProduct
 import honstain.api.Product
 import honstain.client.ProductClient
+import honstain.client.ProductJerseyRXClient
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport
 import io.dropwizard.testing.junit5.ResourceExtension
 import io.mockk.every
@@ -12,6 +13,8 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
 import javax.ws.rs.client.Entity
 import javax.ws.rs.core.GenericType
 import javax.ws.rs.core.Response
@@ -24,7 +27,7 @@ class InventoryResourceTest {
     https://www.dropwizard.io/en/latest/manual/testing.html#testing-resources
      */
 
-    val productClient = mockk<ProductClient>()
+    val productClient = mockk<ProductJerseyRXClient>()
     val EXT: ResourceExtension = ResourceExtension.builder()
             .addResource(InventoryResource(productClient))
             .setMapper(ObjectMapper().registerModule(KotlinModule()))
@@ -46,9 +49,16 @@ class InventoryResourceTest {
     @Test
     fun `GET single inventory with product`() {
 
-        every { productClient.getProduct(1) } returns Product(1, "SKU-01", null, null)
-        every { productClient.getProduct(2) } returns Product(2, "SKU-02", null, null)
-        every { productClient.getProduct(3) } returns Product(3, "SKU-03", null, null)
+        val prod1 = mockk<CompletionStage<Product>>()
+        val prod2 = mockk<CompletionStage<Product>>()
+        val prod3 = mockk<CompletionStage<Product>>()
+        every { productClient.getProduct(1) } returns prod1
+        every { productClient.getProduct(2) } returns prod2
+        every { productClient.getProduct(3) } returns prod3
+
+        every { prod1.toCompletableFuture().get() } returns Product(1, "SKU-01", null, null)
+        every { prod2.toCompletableFuture().get() } returns Product(2, "SKU-02", null, null)
+        every { prod3.toCompletableFuture().get() } returns Product(3, "SKU-03", null, null)
 
         val result = EXT.target("/inventory/5/withProduct").request().get(object: GenericType<List<InventoryWithProduct>>() {})
         // TODO - warning: the data is sourced from a dump in-memory hashMap so that I could work around the need for a DB.

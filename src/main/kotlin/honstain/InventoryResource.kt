@@ -3,16 +3,19 @@ package honstain
 import com.codahale.metrics.annotation.Timed
 import honstain.api.Inventory
 import honstain.api.InventoryWithProduct
+import honstain.api.Product
 import honstain.client.IProduct
+import honstain.client.ProductJerseyRXClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CompletionStage
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
 
 @Path("/inventory")
 @Produces(MediaType.APPLICATION_JSON)
-class InventoryResource(val productClient: IProduct) {
+class InventoryResource(val productClient: ProductJerseyRXClient) {
 
     val log: Logger = LoggerFactory.getLogger(InventoryResource::class.java)
 
@@ -65,7 +68,10 @@ class InventoryResource(val productClient: IProduct) {
         for(productId in products){
             val inventory: Inventory = inventoryRecords.getOrElse(Pair(locationId, productId),{ throw WebApplicationException() })
             log.debug("For inventory:${inventory.locationId} get product:$productId")
-            val product = productClient.getProduct(productId)
+            val productStage: CompletionStage<Product> = productClient.getProduct(productId)
+            // TODO - this is a hack to just get the RX client going.
+            val product: Product = productStage.toCompletableFuture().get()
+
             result.add(InventoryWithProduct(
                     inventory.locationId,
                     inventory.productId,
