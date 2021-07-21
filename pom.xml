@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <dropwizard.version>2.0.23</dropwizard.version>
-        <metrics.version>4.2.0</metrics.version>
+<!--        <metrics.version>4.2.0</metrics.version>-->
 
         <mainClass>honstain.KotlinInventoryServiceApplication</mainClass>
 
@@ -102,16 +102,16 @@
         <!--
         https://metrics.dropwizard.io/4.2.0/getting-started.html
         -->
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>${metrics.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-graphite</artifactId>
-            <version>${metrics.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.dropwizard.metrics</groupId>-->
+<!--            <artifactId>metrics-core</artifactId>-->
+<!--            <version>${metrics.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.dropwizard.metrics</groupId>-->
+<!--            <artifactId>metrics-graphite</artifactId>-->
+<!--            <version>${metrics.version}</version>-->
+<!--        </dependency>-->
 
         <!--
         https://www.dropwizard.io/en/latest/manual/testing.html

@@ -62,3 +62,20 @@ server:
 #  keepAlive: 0ms
 #  retries: 0
 #  userAgent: KotlinInventoryService(KotlinProductService)
+
+jerseyClient: # Remember that JerseyClient extends the attributes of httpClient
+  timeout: 1000ms
+  minThreads: 2
+  maxThreads: 2
+  workQueueSize: 8
+
+metrics:
+  reporters:
+    - type: graphite
+      host: localhost
+      port: 2003
+      prefix: InventoryService.1
+      transport: tcp
+      durationUnit: milliseconds
+      rateUnit: seconds
+      frequency: 5 second

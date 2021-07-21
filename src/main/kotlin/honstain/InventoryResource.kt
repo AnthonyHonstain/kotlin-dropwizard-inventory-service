@@ -4,11 +4,10 @@ import com.codahale.metrics.annotation.Timed
 import honstain.api.Inventory
 import honstain.api.InventoryWithProduct
 import honstain.api.Product
-import honstain.client.IProduct
 import honstain.client.ProductJerseyRXClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CompletionStage
+import java.util.concurrent.CompletableFuture
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
@@ -20,13 +19,21 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
     val log: Logger = LoggerFactory.getLogger(InventoryResource::class.java)
 
     val locationToProduct = mutableMapOf(
-            5L to mutableSetOf(1L, 2L, 3L)
+            5L to mutableSetOf(
+                    1L,
+                    //2L,
+                    //3L,
+                    //4L,
+                    //5L,
+            )
     )
 
     val inventoryRecords = mutableMapOf(
             Pair(5L,1L) to Inventory(5,1, 5),
-            Pair(5L,2L) to Inventory(5,2, 5),
-            Pair(5L,3L) to Inventory(5,3, 5),
+            //Pair(5L,2L) to Inventory(5,2, 5),
+            //Pair(5L,3L) to Inventory(5,3, 5),
+            //Pair(5L,4L) to Inventory(5,4, 1),
+            //Pair(5L,5L) to Inventory(5,5, 1),
     )
 
     @GET
@@ -64,23 +71,58 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
             throw NotFoundException("There is no inventory for locationId:$locationId")
         })
 
-        val result = mutableListOf<InventoryWithProduct>()
-        for(productId in products){
-            val inventory: Inventory = inventoryRecords.getOrElse(Pair(locationId, productId),{ throw WebApplicationException() })
-            log.debug("For inventory:${inventory.locationId} get product:$productId")
-            val productStage: CompletionStage<Product> = productClient.getProduct(productId)
-            // TODO - this is a hack to just get the RX client going.
-            val product: Product = productStage.toCompletableFuture().get()
-
-            result.add(InventoryWithProduct(
-                    inventory.locationId,
-                    inventory.productId,
-                    inventory.quantity,
-                    product.sku,
-            ))
+        val step1: List<CompletableFuture<Inventory>> = products.map { productId ->
+            CompletableFuture.supplyAsync { getInventoryPlain(locationId, productId) }
         }
+
+        val step2: List<CompletableFuture<Product>> = step1.map { foo ->
+            foo.thenCompose { bar ->
+                productClient.getProduct(bar.productId).toCompletableFuture()
+            }
+        }
+
+        val step3: List<CompletableFuture<Product>> = step2.map {foo ->
+            foo.thenApply { bar ->
+                log.debug("Product service client call for product: ${bar.productId} retrieved ${bar.sku}")
+                bar
+            }
+        }
+
+        val step4: List<CompletableFuture<InventoryWithProduct>> = step1.zip(step3)  { foo, bar ->
+            foo.thenCombine(bar) {
+                foo1, bar1 -> InventoryWithProduct(foo1.locationId, foo1.productId, foo1.quantity, bar1.sku)
+            }
+        }
+        //CompletableFuture.allOf(step4.toArray(CompletableFuture[step4.size])).join()
+        val result: List<InventoryWithProduct> = step4.map { foo -> foo.join() }
+                .map { bar ->
+                    log.debug("InventoryWithProduct ${bar.locationId}, ${bar.productId}, ${bar.sku}")
+                    bar
+                }
+
+        //val result = mutableListOf<InventoryWithProduct>()
+        // TODO - stub while trying to experiment with reactive client.
         return result
     }
+
+    fun getInventoryPlain(locationId: Long, productId: Long): Inventory {
+        val inventory: Inventory = inventoryRecords.getOrElse(Pair(locationId, productId),{ throw WebApplicationException() })
+        //Thread.sleep(1000 * max(1, 6 - productId)) // Doing this so the first calls wait longer
+
+        log.debug("Local call for inventory:${inventory.locationId} RESULT - will need to get product:$productId")
+
+        return inventory
+    }
+
+    fun getInventoryFuture(locationId: Long, productId: Long): CompletableFuture<Inventory> {
+        val inventory: Inventory = inventoryRecords.getOrElse(Pair(locationId, productId),{ throw WebApplicationException() })
+        log.debug("For inventory:${inventory.locationId} get product:$productId")
+
+        val future = CompletableFuture<Inventory>()
+        future.complete(inventory)
+        return future
+    }
+
 
     @POST
     @Timed

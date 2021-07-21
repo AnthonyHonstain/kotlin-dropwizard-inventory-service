@@ -19,6 +19,8 @@ class ProductJerseyRXClient(val client: Client) {
     fun getProduct(productId: Long): CompletionStage<Product> {
         val provenanceID = MDC.get("ProvenanceID")
 
+        log.debug("ProductClient $productId")
+
         val getProductTarget: WebTarget = ProductServiceTarget
                 .path("product").path(productId.toString())
 
@@ -27,6 +29,10 @@ class ProductJerseyRXClient(val client: Client) {
                 .header("ProvenanceID", provenanceID)
 
         val response: CompletionStage<Product> = invocation.rx().get(Product::class.java)
+                .exceptionally { throwable ->
+                    log.debug("Error happened ${throwable.message}")
+                    Product(productId, "ERROR", null, null)
+                }
 
         return response
     }
