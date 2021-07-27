@@ -21,19 +21,19 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
     val locationToProduct = mutableMapOf(
             5L to mutableSetOf(
                     1L,
-                    //2L,
-                    //3L,
-                    //4L,
-                    //5L,
+                    2L,
+                    3L,
+                    4L,
+                    5L,
             )
     )
 
     val inventoryRecords = mutableMapOf(
             Pair(5L,1L) to Inventory(5,1, 5),
-            //Pair(5L,2L) to Inventory(5,2, 5),
-            //Pair(5L,3L) to Inventory(5,3, 5),
-            //Pair(5L,4L) to Inventory(5,4, 1),
-            //Pair(5L,5L) to Inventory(5,5, 1),
+            Pair(5L,2L) to Inventory(5,2, 5),
+            Pair(5L,3L) to Inventory(5,3, 5),
+            Pair(5L,4L) to Inventory(5,4, 1),
+            Pair(5L,5L) to Inventory(5,5, 1),
     )
 
     @GET
@@ -64,7 +64,9 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
     @GET
     @Timed
     @Path("/{locationId}/withProduct")
-    fun getSingleWithProduct(@PathParam("locationId") locationId: Long): List<InventoryWithProduct> {
+    fun getSingleWithProduct(
+            @PathParam("locationId") locationId: Long,
+    ): List<InventoryWithProduct> {
         log.debug("getSingleWithProduct $locationId")
 
         val products: MutableSet<Long> = locationToProduct.getOrElse(locationId, {
@@ -72,7 +74,7 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
         })
 
         val step1: List<CompletableFuture<Inventory>> = products.map { productId ->
-            CompletableFuture.supplyAsync { getInventoryPlain(locationId, productId) }
+            getInventoryFuture(locationId, productId)
         }
 
         val step2: List<CompletableFuture<Product>> = step1.map { foo ->
@@ -93,18 +95,23 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
                 foo1, bar1 -> InventoryWithProduct(foo1.locationId, foo1.productId, foo1.quantity, bar1.sku)
             }
         }
-        //CompletableFuture.allOf(step4.toArray(CompletableFuture[step4.size])).join()
+
         val result: List<InventoryWithProduct> = step4.map { foo -> foo.join() }
                 .map { bar ->
                     log.debug("InventoryWithProduct ${bar.locationId}, ${bar.productId}, ${bar.sku}")
                     bar
                 }
-
-        //val result = mutableListOf<InventoryWithProduct>()
-        // TODO - stub while trying to experiment with reactive client.
-        return result
+       return result
     }
 
+    /*
+    getInventoryPlain - This helper function was used in conjunction with a supplyAsync call like:
+                    CompletableFuture.supplyAsync { getInventoryPlain(locationId, productId) }
+    Note the goal of these helper functions was to assist in creating a chain of async calls in a reactive style.
+
+    They are meant to simulate a DB call (which I have done with a thread sleep at time), but I didn't hook a DB
+    in order to simplify my experiments.
+     */
     fun getInventoryPlain(locationId: Long, productId: Long): Inventory {
         val inventory: Inventory = inventoryRecords.getOrElse(Pair(locationId, productId),{ throw WebApplicationException() })
         //Thread.sleep(1000 * max(1, 6 - productId)) // Doing this so the first calls wait longer
@@ -114,6 +121,14 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
         return inventory
     }
 
+    /*
+    getInventoryFuture - This helper function returns a basic CompletableFuture so that it could be chained.
+
+    Note the goal of these helper functions was to assist in creating a chain of async calls in a reactive style.
+
+    They are meant to simulate a DB call (which I have done with a thread sleep at time), but I didn't hook a DB
+    in order to simplify my experiments.
+     */
     fun getInventoryFuture(locationId: Long, productId: Long): CompletableFuture<Inventory> {
         val inventory: Inventory = inventoryRecords.getOrElse(Pair(locationId, productId),{ throw WebApplicationException() })
         log.debug("For inventory:${inventory.locationId} get product:$productId")

@@ -24,8 +24,8 @@ logging:
 # Setup initial configuration following Dropwizard docs - dropped HTTPS and certs
 # https://www.dropwizard.io/en/latest/manual/configuration.html#default
 server:
-  minThreads: 4
-  maxThreads: 4 # Setting this super low to help me explore the system under resource constraints
+  minThreads: 20
+  maxThreads: 20 # Setting this super low to help me explore the system under resource constraints
   adminMinThreads: 1
   adminMaxThreads: 4
   adminContextPath: /
@@ -65,8 +65,8 @@ server:
 
 jerseyClient: # Remember that JerseyClient extends the attributes of httpClient
   timeout: 1000ms
-  minThreads: 2
-  maxThreads: 2
+  minThreads: 20
+  maxThreads: 20
   workQueueSize: 8
 
 metrics:

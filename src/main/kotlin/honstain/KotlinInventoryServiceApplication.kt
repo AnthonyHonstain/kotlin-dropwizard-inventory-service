@@ -50,7 +50,7 @@ class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfi
         val client1 = JerseyClientBuilder(env)
         val client2 = client1.using(config.getJerseyClientConfiguration())
         val client3: Client = client2.buildRx(name, RxInvokerProvider::class.java)
-        val productClient = ProductJerseyRXClient(client3)
+        val productClient = ProductJerseyRXClient(client3, env.metrics())
 
         //val httpClient: CloseableHttpClient = HttpClientBuilder(env)
         //        .using(config.getHttpClientConfiguration())

@@ -1,5 +1,8 @@
 package honstain.client
 
+import com.codahale.metrics.MetricRegistry
+import com.codahale.metrics.MetricRegistry.name
+import com.codahale.metrics.Timer
 import honstain.api.Product
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -10,7 +13,9 @@ import javax.ws.rs.client.Invocation
 import javax.ws.rs.client.WebTarget
 import javax.ws.rs.core.MediaType
 
-class ProductJerseyRXClient(val client: Client) {
+class ProductJerseyRXClient(val client: Client, val metrics: MetricRegistry) {
+
+    val callTimer: Timer = metrics.timer(name(ProductJerseyRXClient::class.java, "callTimer"))
 
     val log: Logger = LoggerFactory.getLogger(ProductJerseyRXClient::class.java)
 
@@ -18,8 +23,8 @@ class ProductJerseyRXClient(val client: Client) {
 
     fun getProduct(productId: Long): CompletionStage<Product> {
         val provenanceID = MDC.get("ProvenanceID")
-
-        log.debug("ProductClient $productId")
+        val start = callTimer.time()
+        log.debug("ProductClient $productId with provenanceID:$provenanceID")
 
         val getProductTarget: WebTarget = ProductServiceTarget
                 .path("product").path(productId.toString())
@@ -29,6 +34,9 @@ class ProductJerseyRXClient(val client: Client) {
                 .header("ProvenanceID", provenanceID)
 
         val response: CompletionStage<Product> = invocation.rx().get(Product::class.java)
+                .whenComplete { complete, throwableThing ->
+                    start.stop()
+                }
                 .exceptionally { throwable ->
                     log.debug("Error happened ${throwable.message}")
                     Product(productId, "ERROR", null, null)
