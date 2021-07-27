@@ -56,9 +56,9 @@ class InventoryResourceTest {
         every { productClient.getProduct(2) } returns prod2
         every { productClient.getProduct(3) } returns prod3
 
-        every { prod1.toCompletableFuture().get() } returns Product(1, "SKU-01", null, null)
-        every { prod2.toCompletableFuture().get() } returns Product(2, "SKU-02", null, null)
-        every { prod3.toCompletableFuture().get() } returns Product(3, "SKU-03", null, null)
+        every { prod1.toCompletableFuture() } returns CompletableFuture.completedFuture(Product(1, "SKU-01", null, null))
+        every { prod2.toCompletableFuture() } returns CompletableFuture.completedFuture(Product(2, "SKU-02", null, null))
+        every { prod3.toCompletableFuture() } returns CompletableFuture.completedFuture(Product(3, "SKU-03", null, null))
 
         val result = EXT.target("/inventory/5/withProduct").request().get(object: GenericType<List<InventoryWithProduct>>() {})
         // TODO - warning: the data is sourced from a dump in-memory hashMap so that I could work around the need for a DB.

@@ -23,17 +23,19 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
                     1L,
                     2L,
                     3L,
+            ),
+            6L to mutableSetOf(
                     4L,
                     5L,
-            )
+            ),
     )
 
     val inventoryRecords = mutableMapOf(
             Pair(5L,1L) to Inventory(5,1, 5),
             Pair(5L,2L) to Inventory(5,2, 5),
             Pair(5L,3L) to Inventory(5,3, 5),
-            Pair(5L,4L) to Inventory(5,4, 1),
-            Pair(5L,5L) to Inventory(5,5, 1),
+            Pair(6L,4L) to Inventory(6,4, 1),
+            Pair(6L,5L) to Inventory(6,5, 1),
     )
 
     @GET

@@ -45,7 +45,7 @@ class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfi
         //val client: Client = JerseyClientBuilder(env)
         //        .using(config.getJerseyClientConfiguration())
         //        .build(name)
-        //val productClient = ProductJerseyClient(client)
+        //val productClient = ProductJerseyClient(client, URI.create("http://localhost:7070"))
 
         val client1 = JerseyClientBuilder(env)
         val client2 = client1.using(config.getJerseyClientConfiguration())

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.net.URI
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
@@ -23,7 +24,7 @@ import javax.ws.rs.core.Response
 
 @ExtendWith(DropwizardExtensionsSupport::class)
 class ProductJerseyClientTest {
-    @Path("http://localhost:7070/product/{productId}")
+    @Path("/product/{productId}")
     class ProductResource {
         @GET
         fun getProduct(@PathParam("productId") productId: Long): Product {
@@ -42,7 +43,10 @@ class ProductJerseyClientTest {
                 // TODO - skipping the config, just want to get the test going and validate the premise.
                 //.using(config.getJerseyClientConfiguration())
                 .build(this.toString())
-        val productClient = ProductJerseyClient(client)
+
+        // Utilized this reference heavily
+        //        https://www.dropwizard.io/en/latest/manual/testing.html#testing-client-implementations
+        val productClient = ProductJerseyClient(client, EXT.baseUri())
         val expected = Product(1, "SKU-01", null, null)
 
         val product = productClient.getProduct(1L)
@@ -64,7 +68,7 @@ class ProductJerseyClientTest {
         every { target.request() } returns invocationBuilder
         every { client.target(any<String>()) } returns target
 
-        val productClient = ProductJerseyClient(client)
+        val productClient = ProductJerseyClient(client, URI.create("http://localhost:7070"))
 
         val productJSON = "{\n" +
             "    \"productId\": 1,\n" +

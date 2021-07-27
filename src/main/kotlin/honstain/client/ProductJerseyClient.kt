@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.net.ConnectException
 import java.net.SocketTimeoutException
+import java.net.URI
+import java.net.URL
 import javax.ws.rs.ProcessingException
 import javax.ws.rs.client.Client
 import javax.ws.rs.client.Invocation
@@ -13,11 +15,11 @@ import javax.ws.rs.client.WebTarget
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
-class ProductJerseyClient(val client: Client) : IProduct {
+class ProductJerseyClient(val client: Client, uri: URI) : IProduct {
 
     val log: Logger = LoggerFactory.getLogger(ProductJerseyClient::class.java)
 
-    val ProductServiceTarget: WebTarget = client.target("http://localhost:7070")
+    val ProductServiceTarget: WebTarget = client.target(uri) //client.target("http://localhost:7070")
 
     override fun getProduct(productId: Long): Product {
         val provenanceID = MDC.get("ProvenanceID")
@@ -40,6 +42,6 @@ class ProductJerseyClient(val client: Client) : IProduct {
                 log.warn("ConnectException for productId: $productId")
             }
         }
-        return Product(1, "1", null, null)
+        return Product(-1, "STUB-error-default", null, null)
     }
 }

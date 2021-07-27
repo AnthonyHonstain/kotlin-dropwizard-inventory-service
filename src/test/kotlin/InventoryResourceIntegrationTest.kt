@@ -51,6 +51,8 @@ class InventoryResourceIntegrationTest {
                 Inventory(5,1, 5),
                 Inventory(5,2, 5),
                 Inventory(5,3, 5),
+                Inventory(6,4, 1),
+                Inventory(6,5, 1),
         )
         assertEquals(expected, result)
     }
