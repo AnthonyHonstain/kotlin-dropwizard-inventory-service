@@ -16,3 +16,16 @@ server:
   adminConnectors:
     - type: http
       port: 7073
+
+consumer:
+  type: basic
+  bootstrapServers:
+    - 127.0.0.1:29092
+  #    - 127.0.0.1:9093
+  #    - 127.0.0.1:9094
+  consumerGroupId: consumer2
+  name: consumerNameToBeUsedInMetrics
+  keyDeserializer:
+    type: string
+  valueDeserializer:
+    type: string

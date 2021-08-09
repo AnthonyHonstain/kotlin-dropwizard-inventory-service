@@ -1,39 +1,35 @@
 package honstain
 
-import com.codahale.metrics.MetricFilter
-import com.codahale.metrics.graphite.Graphite
-import com.codahale.metrics.graphite.GraphiteReporter
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import honstain.client.ProductJerseyClient
 import honstain.client.ProductJerseyRXClient
+import honstain.consumer.QuickStartEventConsumer
 import io.dropwizard.Application
 import io.dropwizard.client.JerseyClientBuilder
+import io.dropwizard.kafka.KafkaConsumerBundle
+import io.dropwizard.kafka.KafkaConsumerFactory
+import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
-import java.net.InetSocketAddress
-import java.util.*
-import java.util.concurrent.TimeUnit
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener
+import java.util.concurrent.ExecutorService
 import javax.ws.rs.client.Client
 import javax.ws.rs.client.RxInvokerProvider
 
 
-class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfiguration>() {
+open class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfiguration>() {
     companion object {
         @JvmStatic fun main(args: Array<String>) = KotlinInventoryServiceApplication().run(*args)
     }
 
     override fun getName(): String = "KotlinInventoryService"
 
-    override fun run(config: KotlinInventoryServiceConfiguration, env: Environment) {
-        //val uniqueServiceId = 1 //UUID.randomUUID()
-        //val graphite = Graphite(InetSocketAddress("localhost", 2003))
-        //val reporter = GraphiteReporter.forRegistry(env.metrics())
-        //        .prefixedWith("InventoryService.$uniqueServiceId")
-        //        .convertRatesTo(TimeUnit.SECONDS)
-        //        .convertDurationsTo(TimeUnit.MILLISECONDS)
-        //        .filter(MetricFilter.ALL)
-        //        .build(graphite)
-        //reporter.start(5, TimeUnit.SECONDS)
+    override fun initialize(bootstrap: Bootstrap<KotlinInventoryServiceConfiguration>) {
+        super.initialize(bootstrap)
 
+        bootstrap.addBundle(kafkaConsumer)
+    }
+
+    override fun run(config: KotlinInventoryServiceConfiguration, env: Environment) {
         /*
         Had some trouble remembering how to interact with the object mapper.
         References:
@@ -59,5 +55,28 @@ class KotlinInventoryServiceApplication: Application<KotlinInventoryServiceConfi
 
         env.jersey().register(InventoryResource(productClient))
         env.jersey().register(ProvenanceIDFilter())
+
+        val consumer: Consumer<String?, String?> = kafkaConsumer.consumer
+        val quickStartEventConsumer = QuickStartEventConsumer(consumer)
+        val executorService: ExecutorService = env.lifecycle()
+                .executorService("Kafka-quickstart-event-consumer")
+                .maxThreads(1)
+                .build()
+        executorService.submit(quickStartEventConsumer)
+
+        println("Dropwizard lifecycle tracking the following managedObjects:")
+        for (lifecycle in env.lifecycle().managedObjects) {
+            println("ManagedObject: $lifecycle")
+        }
+    }
+
+    private val topics: Collection<String> = listOf("quickstart-events")
+
+    private val kafkaConsumer: KafkaConsumerBundle<String?, String?, KotlinInventoryServiceConfiguration> =
+            object : KafkaConsumerBundle<String?, String?, KotlinInventoryServiceConfiguration>(topics, NoOpConsumerRebalanceListener()) {
+
+                override fun getKafkaConsumerFactory(configuration: KotlinInventoryServiceConfiguration): KafkaConsumerFactory<String?, String?> {
+                    return configuration.getKafkaConsumerFactory()!!
+                }
     }
 }
