@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType
 
 @Path("/inventory")
 @Produces(MediaType.APPLICATION_JSON)
-class InventoryResource(val productClient: ProductJerseyRXClient) {
+class InventoryResource(val productClient: ProductJerseyRXClient, val productCache: Map<Long, Product>) {
 
     val log: Logger = LoggerFactory.getLogger(InventoryResource::class.java)
 
@@ -81,7 +81,15 @@ class InventoryResource(val productClient: ProductJerseyRXClient) {
 
         val step2: List<CompletableFuture<Product>> = step1.map { foo ->
             foo.thenCompose { bar ->
-                productClient.getProduct(bar.productId).toCompletableFuture()
+                if (productCache.containsKey(bar.productId)) {
+                    log.debug("cache HIT locationId:${bar.locationId} productId:${bar.productId}")
+                    val future = CompletableFuture<Product>()
+                    future.complete(productCache.get(bar.productId))
+                    future
+                } else {
+                    log.debug("cache MISS locationId:${bar.locationId} productId:${bar.productId}")
+                    productClient.getProduct(bar.productId).toCompletableFuture()
+                }
             }
         }
 

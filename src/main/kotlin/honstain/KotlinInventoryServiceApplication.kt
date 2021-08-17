@@ -1,6 +1,7 @@
 package honstain
 
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import honstain.api.Product
 import honstain.client.ProductJerseyRXClient
 import honstain.consumer.QuickStartEventConsumer
 import io.dropwizard.Application
@@ -53,11 +54,13 @@ open class KotlinInventoryServiceApplication: Application<KotlinInventoryService
         //        .build(name)
         //val productClient = ProductClient(httpClient, env.objectMapper)
 
-        env.jersey().register(InventoryResource(productClient))
+        val productCache = mutableMapOf<Long, Product>()
+
+        env.jersey().register(InventoryResource(productClient, productCache))
         env.jersey().register(ProvenanceIDFilter())
 
         val consumer: Consumer<String?, String?> = kafkaConsumer.consumer
-        val quickStartEventConsumer = QuickStartEventConsumer(consumer)
+        val quickStartEventConsumer = QuickStartEventConsumer(consumer, productCache, env.objectMapper)
         val executorService: ExecutorService = env.lifecycle()
                 .executorService("Kafka-quickstart-event-consumer")
                 .maxThreads(1)

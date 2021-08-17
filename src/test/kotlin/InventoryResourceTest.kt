@@ -4,13 +4,15 @@ import honstain.InventoryResource
 import honstain.api.Inventory
 import honstain.api.InventoryWithProduct
 import honstain.api.Product
-import honstain.client.ProductClient
 import honstain.client.ProductJerseyRXClient
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport
 import io.dropwizard.testing.junit5.ResourceExtension
+import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.concurrent.CompletableFuture
@@ -27,11 +29,32 @@ class InventoryResourceTest {
     https://www.dropwizard.io/en/latest/manual/testing.html#testing-resources
      */
 
+    val productCache = mutableMapOf<Long, Product>()
     val productClient = mockk<ProductJerseyRXClient>()
     val EXT: ResourceExtension = ResourceExtension.builder()
-            .addResource(InventoryResource(productClient))
+            .addResource(InventoryResource(productClient, productCache))
             .setMapper(ObjectMapper().registerModule(KotlinModule()))
             .build()
+
+    @BeforeEach
+    fun setup() {
+        productCache.clear()
+    }
+
+    @Test
+    fun `GET all inventory`() {
+        val result = EXT.target("/inventory/").request().get(object: GenericType<List<Inventory>>() {})
+        // TODO - warning: the data is sourced from a dump in-memory hashMap so that I could work around the need for a DB.
+
+        val expected = listOf(
+                Inventory(5,1, 5),
+                Inventory(5,2, 5),
+                Inventory(5,3, 5),
+                Inventory(6,4, 1),
+                Inventory(6,5, 1),
+        )
+        assertEquals(expected, result)
+    }
 
     @Test
     fun `GET single inventory`() {
@@ -47,7 +70,32 @@ class InventoryResourceTest {
     }
 
     @Test
-    fun `GET single inventory with product`() {
+    fun `GET single inventory with product with product cache`() {
+        productCache[1] = Product(1, "SKU-01", null, null)
+
+        val prod2 = mockk<CompletionStage<Product>>()
+        val prod3 = mockk<CompletionStage<Product>>()
+
+        every { productClient.getProduct(2) } returns prod2
+        every { productClient.getProduct(3) } returns prod3
+
+        every { prod2.toCompletableFuture() } returns CompletableFuture.completedFuture(Product(2, "SKU-02", null, null))
+        every { prod3.toCompletableFuture() } returns CompletableFuture.completedFuture(Product(3, "SKU-03", null, null))
+
+        val result = EXT.target("/inventory/5/withProduct").request().get(object: GenericType<List<InventoryWithProduct>>() {})
+        // TODO - warning: the data is sourced from a dump in-memory hashMap so that I could work around the need for a DB.
+
+        val expected = listOf(
+                InventoryWithProduct(5,1, 5, "SKU-01"),
+                InventoryWithProduct(5,2, 5, "SKU-02"),
+                InventoryWithProduct(5,3, 5, "SKU-03"),
+        )
+        assertEquals(expected, result)
+        verify(exactly = 0) { productClient.getProduct(1) }
+    }
+
+    @Test
+    fun `GET single inventory with product and empty cache`() {
 
         val prod1 = mockk<CompletionStage<Product>>()
         val prod2 = mockk<CompletionStage<Product>>()
@@ -69,6 +117,7 @@ class InventoryResourceTest {
                 InventoryWithProduct(5,3, 5, "SKU-03"),
         )
         assertEquals(expected, result)
+        verify(exactly = 3) { productClient.getProduct(any()) }
     }
 
     @Test
