@@ -29,3 +29,42 @@ consumer:
     type: string
   valueDeserializer:
     type: string
+
+dltConsumer:
+  type: basic
+  bootstrapServers:
+    - 127.0.0.1:29092
+  #    - 127.0.0.1:9093
+  #    - 127.0.0.1:9094
+  consumerGroupId: consumer3
+  name: dltConsumerNameToBeUsedInMetrics
+  keyDeserializer:
+    type: string
+  valueDeserializer:
+    type: string
+#  security:
+#    securityProtocol: sasl_ssl
+#    sslProtocol: TLSv1.2
+#    saslMechanism: PLAIN
+#    saslJaas: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"<username>\" password=\"<password>\";"
+
+dltProducer:
+  type: basic
+  bootstrapServers:
+    - 127.0.0.1:29092
+  #    - 127.0.0.1:9093
+  #    - 127.0.0.1:9094
+  name: dltProducerNameToBeUsedInMetrics
+  keySerializer:
+    type: string
+  valueSerializer:
+    type: string
+  acks: all
+  retries: 0
+  maxInFlightRequestsPerConnection: 1
+  maxPollBlockTime: 10s
+#  security:
+#    securityProtocol: sasl_ssl
+#    sslProtocol: TLSv1.2
+#    saslMechanism: PLAIN
+#    saslJaas: "org.apache.kafka.comm

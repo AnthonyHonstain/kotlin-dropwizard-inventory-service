@@ -1,3 +1,7 @@
+#
+# This config was created to assist in testing how this Kafka consumer would behave with multiple instances running.
+#
+
 logging:
   level: INFO
   loggers:
@@ -32,10 +36,10 @@ server:
   applicationContextPath: /
   applicationConnectors:
     - type: http
-      port: 7080
+      port: 7082
   adminConnectors:
     - type: http
-      port: 7081
+      port: 7083
   requestLog:
     appenders:
       - type: file
@@ -92,12 +96,6 @@ consumer:
     type: string
   valueDeserializer:
     type: string
-
-  # This is part of an experiment to better understand consumer configuration options.
-  #   Looking for something that will cause it to shutdown faster for slow processing
-  #autoCommitInterval: 1000ms # FAIL - no impact
-  #maxPollRecords: 1 # FAIL - no impact
-
 #  security:
 #    securityProtocol: sasl_ssl
 #    sslProtocol: TLSv1.2
@@ -116,9 +114,6 @@ dltConsumer:
     type: string
   valueDeserializer:
     type: string
-
-  # This is part of an experiment to better understand consumer configuration options.
-  autoCommitInterval: 1000ms # FAIL - no impact
 #  security:
 #    securityProtocol: sasl_ssl
 #    sslProtocol: TLSv1.2

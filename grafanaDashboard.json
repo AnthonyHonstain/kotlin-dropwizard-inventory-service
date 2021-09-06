@@ -19,13 +19,195 @@
   "links": [],
   "panels": [
     {
-      "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
+      },
+      "id": 45,
+      "title": "Log Stats",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 47,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "refCount": 0,
+          "refId": "A",
+          "target": "InventoryService.*.ch.qos.logback.core.Appender.warn.count"
+        },
+        {
+          "hide": false,
+          "refCount": 0,
+          "refId": "B",
+          "target": "InventoryService.*.ch.qos.logback.core.Appender.error.count"
+        }
+      ],
+      "title": "logback count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 48,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "refCount": 0,
+          "refId": "A",
+          "target": "InventoryService.*.ch.qos.logback.core.Appender.warn.m1_rate"
+        },
+        {
+          "hide": false,
+          "refCount": 0,
+          "refId": "B",
+          "target": "InventoryService.*.ch.qos.logback.core.Appender.error.m1_rate"
+        }
+      ],
+      "title": "logback rate",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
       },
       "id": 37,
       "panels": [],
@@ -88,7 +270,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 10
       },
       "id": 33,
       "options": {
@@ -179,7 +361,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 10
       },
       "id": 35,
       "options": {
@@ -270,7 +452,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 9
+        "y": 18
       },
       "id": 39,
       "options": {
@@ -356,7 +538,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 9
+        "y": 18
       },
       "id": 40,
       "options": {
@@ -443,7 +625,7 @@
         "h": 8,
         "w": 12,
         "x": 6,
-        "y": 17
+        "y": 26
       },
       "id": 41,
       "options": {
@@ -474,11 +656,185 @@
     },
     {
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 34
+      },
+      "id": 42,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "refCount": 0,
+          "refId": "A",
+          "target": "InventoryService.*.honstain.consumer.QuickStartEventConsumer.productBatchTimer.p50"
+        },
+        {
+          "hide": false,
+          "refCount": 0,
+          "refId": "B",
+          "target": "InventoryService.*.honstain.consumer.QuickStartEventConsumer.productBatchTimer.p99"
+        }
+      ],
+      "title": "Kafka productBatchTimer",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 34
+      },
+      "id": 43,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "refCount": 0,
+          "refId": "A",
+          "target": "InventoryService.*.honstain.consumer.QuickStartEventConsumer.productTimer.p50"
+        },
+        {
+          "hide": false,
+          "refCount": 0,
+          "refId": "B",
+          "target": "InventoryService.*.honstain.consumer.QuickStartEventConsumer.productTimer.p99"
+        }
+      ],
+      "title": "Kafka productTimer",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 42
       },
       "id": 19,
       "title": "Client",
@@ -540,7 +896,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 43
       },
       "id": 21,
       "options": {
@@ -618,7 +974,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 43
       },
       "id": 23,
       "options": {
@@ -696,7 +1052,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 51
       },
       "id": 25,
       "options": {
@@ -775,7 +1131,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 51
       },
       "id": 27,
       "options": {
@@ -853,7 +1209,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 59
       },
       "id": 28,
       "options": {
@@ -932,7 +1288,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 59
       },
       "id": 26,
       "options": {
@@ -961,7 +1317,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 67
       },
       "id": 10,
       "panels": [],
@@ -1024,7 +1380,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 51
+        "y": 68
       },
       "id": 2,
       "options": {
@@ -1104,7 +1460,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 51
+        "y": 68
       },
       "id": 29,
       "options": {
@@ -1184,7 +1540,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 59
+        "y": 76
       },
       "id": 6,
       "options": {
@@ -1264,7 +1620,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 59
+        "y": 76
       },
       "id": 11,
       "options": {
@@ -1344,7 +1700,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 67
+        "y": 84
       },
       "id": 5,
       "options": {
@@ -1375,7 +1731,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 75
+        "y": 92
       },
       "id": 8,
       "panels": [],
@@ -1439,7 +1795,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 76
+        "y": 93
       },
       "id": 4,
       "options": {
@@ -1526,7 +1882,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 76
+        "y": 93
       },
       "id": 30,
       "options": {
@@ -1607,7 +1963,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 84
+        "y": 101
       },
       "id": 15,
       "options": {
@@ -1687,7 +2043,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 84
+        "y": 101
       },
       "id": 31,
       "options": {
@@ -1767,7 +2123,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 92
+        "y": 109
       },
       "id": 12,
       "options": {
@@ -1797,7 +2153,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 100
+        "y": 117
       },
       "id": 17,
       "panels": [],
@@ -1860,7 +2216,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 101
+        "y": 118
       },
       "id": 13,
       "options": {
@@ -1941,7 +2297,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 101
+        "y": 118
       },
       "id": 14,
       "options": {
@@ -1981,5 +2337,5 @@
   "timezone": "",
   "title": "Dropwziard Inventory",
   "uid": "joGOlji7z",
-  "version": 11
+  "version": 13
 }

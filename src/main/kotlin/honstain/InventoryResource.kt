@@ -1,12 +1,16 @@
 package honstain
 
 import com.codahale.metrics.annotation.Timed
+import com.fasterxml.jackson.databind.ObjectMapper
 import honstain.api.Inventory
 import honstain.api.InventoryWithProduct
 import honstain.api.Product
 import honstain.client.ProductJerseyRXClient
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -14,7 +18,12 @@ import javax.ws.rs.core.MediaType
 
 @Path("/inventory")
 @Produces(MediaType.APPLICATION_JSON)
-class InventoryResource(val productClient: ProductJerseyRXClient, val productCache: Map<Long, Product>) {
+class InventoryResource(
+        val productClient: ProductJerseyRXClient,
+        val productCache: MutableMap<Long, Product>,
+        val consumer: Consumer<String?, String?>,
+        val objectMapper: ObjectMapper,
+) {
 
     val log: Logger = LoggerFactory.getLogger(InventoryResource::class.java)
 
@@ -172,5 +181,39 @@ class InventoryResource(val productClient: ProductJerseyRXClient, val productCac
 
         this.inventoryRecords[Pair(inventory.locationId, inventory.productId)] = inventory
         return inventory
+    }
+
+    @POST
+    @Timed
+    @Path("/consume/productDLT")
+    fun consumeProductDLT(): Int {
+        var totalRecordsProcessed = 0
+        try {
+            //consumer.subscribe(listOf("dlq-product"))
+
+            var previousBatch = 1
+            var attempts = 3
+
+            while (attempts-- > 0 || previousBatch > 0) {
+                val records: ConsumerRecords<String?, String?> = consumer.poll(Duration.ofMillis(100))
+                log.info("Batchsize: ${records.count()}")
+                for (record in records) {
+                    log.info("${record.topic()} ${record.offset()}, ${record.value()}")
+                    val foo: String = record.value()!!
+                    val bar = objectMapper.readValue(foo, Product::class.java)
+                    productCache[bar.productId] = bar
+                    //Thread.sleep(100)
+                }
+                totalRecordsProcessed += records.count()
+                previousBatch = records.count()
+            }
+        }
+        catch (e: Exception) {
+            log.error("Failed to consume message: ${e.message}")
+        }
+        //finally {
+        //    consumer.wakeup()
+        //}
+        return totalRecordsProcessed
     }
 }

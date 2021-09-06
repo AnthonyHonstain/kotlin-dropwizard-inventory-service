@@ -11,6 +11,7 @@ import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.apache.kafka.clients.consumer.Consumer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,9 +32,11 @@ class InventoryResourceTest {
 
     val productCache = mutableMapOf<Long, Product>()
     val productClient = mockk<ProductJerseyRXClient>()
+    val consumer = mockk<Consumer<String?, String?>>()
+    val objectMapper = ObjectMapper().registerModule(KotlinModule())
     val EXT: ResourceExtension = ResourceExtension.builder()
-            .addResource(InventoryResource(productClient, productCache))
-            .setMapper(ObjectMapper().registerModule(KotlinModule()))
+            .addResource(InventoryResource(productClient, productCache, consumer, objectMapper))
+            .setMapper(objectMapper)
             .build()
 
     @BeforeEach
