@@ -18,6 +18,18 @@ I use the Dropwizard Metrics library to report to Graphite
 * https://www.dropwizard.io/projects/metrics/en/latest/manual/jersey.html
 * https://metrics.dropwizard.io/4.2.0/manual/graphite.html#manual-graphite
 
+There is a grafana dashboard record in grafanaDashboard.json that you can use to recreate the dashboard. 
+This was the guide I used to run Grafana locally (Grafana and Graphite via docker-compose) https://www.linode.com/docs/guides/install-graphite-and-grafana/
+
+### Kafka
+This uses the Dropwizard version of the Kafka client that utilizes the Apache Kafka client.
+* https://github.com/dropwizard/dropwizard-kafka
+
+**WARNING** The integration test assumes there is a Kafka cluster to interact with, if you want to change that you can modify product-service-test-config.yml 
+
+### Docker Compose
+I have included in the folder `docker-compose_stuff` the configuration for the Grafan+Graphite stack and the Kafka+Kowl stack.
+
 How to start the KotlinProductService application
 ---
 
