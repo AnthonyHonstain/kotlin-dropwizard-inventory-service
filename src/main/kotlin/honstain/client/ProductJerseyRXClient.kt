@@ -38,7 +38,7 @@ class ProductJerseyRXClient(val client: Client, val metrics: MetricRegistry) {
                     start.stop()
                 }
                 .exceptionally { throwable ->
-                    log.debug("Error happened ${throwable.message}")
+                    log.error("Error happened ${throwable.message}")
                     Product(productId, "ERROR", null, null)
                 }
 
