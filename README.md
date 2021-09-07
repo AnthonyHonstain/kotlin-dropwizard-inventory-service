@@ -41,3 +41,11 @@ Health Check
 ---
 
 To see your applications health enter url `http://localhost:7081/healthcheck`
+
+Project Links
+---
+
+* Kowl http://localhost:9080/topics
+* Dropwizard Metrics http://localhost:7081/metrics?pretty=true
+* Grafana http://localhost:3000/
+* Graphite http://localhost:8080/
